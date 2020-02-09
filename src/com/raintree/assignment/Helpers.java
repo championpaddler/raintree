@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -74,14 +76,18 @@ public class Helpers {
 
 	public void filterDisconnects(Date start, Date end) {
 		System.out.println("Computer Name\tNumber of Disconnects");
+		HashMap<String,Integer> hmap = new HashMap<String,Integer>();
 		list.forEach(e -> {
 			if (e.isValid(start, end) && e.getFaultType().equals(FaultType.DISCONNECT)) {
-				System.out.println(e.getName() + "\t" + e.getFaultCount());
+				if(hmap.containsKey(e.getName())) {
+					hmap.put(e.getName(), hmap.get(e.getName())+e.getFaultCount());
+				} else {
+					hmap.put(e.getName(), e.getFaultCount());
+				}
 			}
 		});
+		hmap.forEach((k,v)->System.out.println(k + "\t" + v));
 		System.out.println("\n");
-
-
 	}
 
 	public void filterDrops(Date start, Date end) {
@@ -104,6 +110,24 @@ public class Helpers {
 		});
 		System.out.println("\n");
 
+	}
+
+	public void processInput() {
+		Scanner sc = new Scanner(System.in);
+	     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+	     System.out.println("Enter Start Date in DD-MM-YYYY");  
+		 Date start;
+		try {
+			start = formatter.parse(sc.next());
+			System.out.println("Enter End Date in DD-MM-YYYY");
+			 Date end = formatter.parse(sc.next());
+		     System.out.println("Date :"+ new SimpleDateFormat("dd-MM-yyyy").format(start)+" to "+new SimpleDateFormat("dd-MM-yyyy").format(end)+"\n");
+		     filterDisconnects(start, end);
+		     filterDrops(start, end);
+		     filterTimeExceed(start, end);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}		
 	}
 
 }
