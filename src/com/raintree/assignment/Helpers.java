@@ -74,11 +74,11 @@ public class Helpers {
 		}
 	}
 
-	public void filterDisconnects(Date start, Date end) {
-		System.out.println("Computer Name\tNumber of Disconnects");
+	public void filter(Date start, Date end,String message,FaultType fault) {
+		System.out.println("Computer Name\tNumber of "+message);
 		HashMap<String,Integer> hmap = new HashMap<String,Integer>();
 		list.forEach(e -> {
-			if (e.isValid(start, end) && e.getFaultType().equals(FaultType.DISCONNECT)) {
+			if (e.isValid(start, end) && e.getFaultType().equals(fault)) {
 				if(hmap.containsKey(e.getName())) {
 					hmap.put(e.getName(), hmap.get(e.getName())+e.getFaultCount());
 				} else {
@@ -88,28 +88,6 @@ public class Helpers {
 		});
 		hmap.forEach((k,v)->System.out.println(k + "\t" + v));
 		System.out.println("\n");
-	}
-
-	public void filterDrops(Date start, Date end) {
-		System.out.println("Computer Name\tNumber of Drops");
-		list.forEach(e -> {
-			if (e.isValid(start, end) && e.getFaultType().equals(FaultType.DROP)) {
-				System.out.println(e.getName() + "\t" + e.getFaultCount());
-			}
-		});
-		System.out.println("\n");
-		
-	}
-
-	public void filterTimeExceed(Date start, Date end) {
-		System.out.println("Computer Name\tNumber of Average limit exceeded");
-		list.forEach(e -> {
-			if (e.isValid(start, end) && e.getFaultType().equals(FaultType.EXCEED)) {
-				System.out.println(e.getName() + "\t" + e.getFaultCount());
-			}
-		});
-		System.out.println("\n");
-
 	}
 
 	public void processInput() {
@@ -122,9 +100,9 @@ public class Helpers {
 			System.out.println("Enter End Date in DD-MM-YYYY");
 			 Date end = formatter.parse(sc.next());
 		     System.out.println("Date :"+ new SimpleDateFormat("dd-MM-yyyy").format(start)+" to "+new SimpleDateFormat("dd-MM-yyyy").format(end)+"\n");
-		     filterDisconnects(start, end);
-		     filterDrops(start, end);
-		     filterTimeExceed(start, end);
+		     filter(start, end,"Disconnects",FaultType.DISCONNECT);
+		     filter(start, end,"Drops",FaultType.DROP);
+		     filter(start, end,"Average limit exceeded",FaultType.EXCEED);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}		
